@@ -6,7 +6,20 @@ const int kNumPresets = 1;
 
 enum EParams
 {
-  kGain = 0,
+  kGainIn = 0,
+  kGainOut,
+  eqBand1Gain,
+  eqBand1Freq,
+  eqBand1Q,
+  eqBand2Gain,
+  eqBand2Freq,
+  eqBand2Q,
+  eqBand3Gain,
+  eqBand3Freq,
+  eqBand3Q,
+  eqBand4Gain,
+  eqBand4Freq,
+  eqBand4Q,
   kNumParams
 };
 
