@@ -1,6 +1,7 @@
 #include "ChannelStrip.h"
 #include "IPlug_include_in_plug_src.h"
 #include "IControls.h"
+#include "IPlugPaths.h"
 
 ChannelStrip::ChannelStrip(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets))
@@ -29,19 +30,34 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     pGraphics->AttachControl(inputKnob);
 
     IRECT inputMeterBounds = IRECT(5.0, 5.0, 45, 445);
-    IVMeterControl<2>* inputMeter = new IVMeterControl<2>(inputMeterBounds, "IN", meterStyle, EDirection::Vertical);
-    pGraphics->AttachControl(inputMeter);
-    inputMeter->GetControl(0)->As<IVMeterControl<2>>()->Set(0, signalLevelsIn[0]);
-    inputMeter->GetControl(1)->As<IVMeterControl<2>>()->Set(1, signalLevelsIn[1]);
+    IVPeakAvgMeterControl<2>*inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", meterStyle, EDirection::Vertical);
+    pGraphics->AttachControl(inputMeter, kCtrlTagInMeter);
 
     //Output
-    pGraphics->AttachControl(new IVKnobControl(IRECT(950, 450, 1000, 500), kGainOut, "", knobStyle, true, false, -135.0, 27.0, 0.0));
-    pGraphics->AttachControl(new IVMeterControl<2>(IRECT(955, 5.0, 995, 445), "OUT", meterStyle, EDirection::Vertical));
+    IRECT outputKnobBounds = IRECT(950, 450, 1000, 500);
+    IVKnobControl* outputKnob = new IVKnobControl(outputKnobBounds, kGainOut, "", knobStyle, true, false, -135.0, 27.0, 0.0);
+    pGraphics->AttachControl(outputKnob);
+
+    IRECT outputMeterBounds = IRECT(955, 5.0, 995, 445);
+    IVPeakAvgMeterControl<2>* outputMeter = new IVPeakAvgMeterControl<2>(outputMeterBounds, "OUT", meterStyle, EDirection::Vertical);
+    pGraphics->AttachControl(outputMeter, kCtrlTagOutMeter);
   };
 #endif
 }
 
 #if IPLUG_DSP
+void ChannelStrip::OnIdle()
+{
+  mPeakAvgInMeterSender.TransmitData(*this);
+  mPeakAvgOutMeterSender.TransmitData(*this);
+}
+
+void ChannelStrip::OnReset()
+{
+  mPeakAvgInMeterSender.Reset(GetSampleRate());
+  mPeakAvgOutMeterSender.Reset(GetSampleRate());
+}
+
 void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
   const double gainIn = GetParam(kGainIn)->Value();
@@ -73,5 +89,8 @@ void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       signalLevelsOut[c] += outputs[c][s] * outputs[c][s];
     }
   }
+
+  mPeakAvgInMeterSender.ProcessBlock(inputs, nFrames, kCtrlTagInMeter);
+  mPeakAvgOutMeterSender.ProcessBlock(outputs, nFrames, kCtrlTagOutMeter);
 }
 #endif
