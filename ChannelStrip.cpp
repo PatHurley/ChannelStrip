@@ -30,6 +30,16 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
   GetParam(kEqBand4Alt)->InitBool("", false);
 
+  GetParam(kDyn1Thresh)->InitDouble("", 0.0, -50.0, 0.0, 0.01, "dB");
+  GetParam(kDyn1Attack)->InitDouble("", 15.0, .01, 1000.0, 0.01, "ms");
+  GetParam(kDyn1Release)->InitDouble("", 100.0, 5.0, 5000.0, 0.1, "ms");
+  GetParam(kDyn1Ratio)->InitInt("", 0, 0, 7);
+
+  GetParam(kDyn2Thresh)->InitDouble("", 0.0, -50.0, 0.0, 0.01, "dB");
+  GetParam(kDyn2Attack)->InitDouble("", 15.0, .01, 1000.0, 0.01, "ms");
+  GetParam(kDyn2Release)->InitDouble("", 100.0, 5.0, 5000.0, 0.1, "ms");
+  GetParam(kDyn2Ratio)->InitInt("", 0, 0, 7);
+
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
@@ -37,19 +47,46 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   
   mLayoutFunc = [&](IGraphics* pGraphics) {
     pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
-    pGraphics->AttachPanelBackground(COLOR_GRAY);
+    pGraphics->AttachPanelBackground(IColor(255, 128, 128, 128));
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
     const IRECT b = pGraphics->GetBounds();
 
-    IVStyle knobStyle = DEFAULT_STYLE;
-    IVStyle meterStyle = DEFAULT_STYLE;
+    //EQ
+    IRECT EQBounds = IRECT(50, 10, 950, 250);
+    IRECT EQ1Bounds = EQBounds.SubRectHorizontal(4, 0).GetReducedFromTop(5);
+    IRECT EQ2Bounds = EQBounds.SubRectHorizontal(4, 1).GetReducedFromTop(5);
+    IRECT EQ3Bounds = EQBounds.SubRectHorizontal(4, 2).GetReducedFromTop(5);
+    IRECT EQ4Bounds = EQBounds.SubRectHorizontal(4, 3).GetReducedFromTop(5);
 
-    //Input gain & meter
+    pGraphics->AttachControl(new IPanelControl(EQBounds, IColor(255, 32, 32, 32))); //EQ Background
+    IVStyle EQKnobStyle = IVStyle();
+    EQKnobStyle.valueText = IText(16.0f, IColor(255, 224, 224, 224));
+    EQKnobStyle.valueText.mVAlign = EVAlign::Top;
+    EQKnobStyle.valueText.mAlign = EAlign::Center;
+
+    IVStyle EQSwitchStyle = IVStyle();
+
+    AttachBandControls(pGraphics, EQ1Bounds, EQKnobStyle, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, EQSwitchStyle, kEqBand1Alt, "HPF");
+    AttachBandControls(pGraphics, EQ2Bounds, EQKnobStyle, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, EQSwitchStyle, kEqBand2Alt, "LO SHLF");
+    AttachBandControls(pGraphics, EQ3Bounds, EQKnobStyle, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, EQSwitchStyle, kEqBand3Alt, "HI SHLF");
+    AttachBandControls(pGraphics, EQ4Bounds, EQKnobStyle, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, EQSwitchStyle, kEqBand4Alt, "LPF");
+
+    //DYN
+    IRECT DYNBounds = IRECT(50, 250, 950, 490);
+    IRECT DYN1Bounds = DYNBounds.SubRectHorizontal(2, 0);
+    IRECT DYN2Bounds = DYNBounds.SubRectHorizontal(2, 1);
+
+    pGraphics->AttachControl(new IPanelControl(DYNBounds, IColor(255, 224, 224, 224))); //DYN Background
+
+    IVStyle DYNKnobStyle = IVStyle();
+    IVStyle DYNSwitchStyle = IVStyle();
+
+    // Input gain & meter
     IRECT inputKnobBounds = IRECT(0, 450, 50, 500);
     IRECT inputMeterBounds = IRECT(5, 5, 45, 445);
 
-    IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", knobStyle, true, false, -135.0, 27.0, 0.0);
-    IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", meterStyle, EDirection::Vertical);
+    IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", DEFAULT_STYLE, true, false, -135.0, 27.0, 0.0);
+    IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", DEFAULT_STYLE, EDirection::Vertical);
 
     pGraphics->AttachControl(inputKnob);
     pGraphics->AttachControl(inputMeter, kCtrlTagInMeter);
@@ -58,38 +95,28 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IRECT outputKnobBounds = IRECT(950, 450, 1000, 500);
     IRECT outputMeterBounds = IRECT(955, 5, 995, 445);
 
-    IVKnobControl* outputKnob = new IVKnobControl(outputKnobBounds, kGainOut, "", knobStyle, true, false, -135.0, 27.0, 0.0);
-    IVPeakAvgMeterControl<2>* outputMeter = new IVPeakAvgMeterControl<2>(outputMeterBounds, "OUT", meterStyle, EDirection::Vertical);
+    IVKnobControl* outputKnob = new IVKnobControl(outputKnobBounds, kGainOut, "", DEFAULT_STYLE, true, false, -135.0, 27.0, 0.0);
+    IVPeakAvgMeterControl<2>* outputMeter = new IVPeakAvgMeterControl<2>(outputMeterBounds, "OUT", DEFAULT_STYLE, EDirection::Vertical);
 
     pGraphics->AttachControl(outputKnob);
     pGraphics->AttachControl(outputMeter, kCtrlTagOutMeter);
-
-    //EQ
-    IRECT EQBounds = IRECT(50, 25, 950, 225);
-    IRECT EQ1Bounds = EQBounds.SubRectHorizontal(4, 0);
-    IRECT EQ2Bounds = EQBounds.SubRectHorizontal(4, 1);
-    IRECT EQ3Bounds = EQBounds.SubRectHorizontal(4, 2);
-    IRECT EQ4Bounds = EQBounds.SubRectHorizontal(4, 3);
-
-    AttachBandControls(pGraphics, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "BAND 1", "HPF");
-    AttachBandControls(pGraphics, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "BAND 2", "LO SHLF");
-    AttachBandControls(pGraphics, EQ3Bounds, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "BAND 3", "HI SHLF");
-    AttachBandControls(pGraphics, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "BAND 4", "LPF");
   };
 #endif
 }
 
-void ChannelStrip::AttachBandControls(IGraphics* pGraphics, IRECT bandRect, int gainParamIndex, int freqParamIndex, int qParamIndex, int modeParamIndex, const char* bandLabel, const char* altLabel)
+void ChannelStrip::AttachBandControls(IGraphics* pGraphics, IRECT bandRect,
+                                      IVStyle knobStyle, int gainParamIndex, int freqParamIndex, int qParamIndex,
+                                      IVStyle switchStyle, int modeParamIndex, const char* altLabel)
 {
   IRECT gainBounds = bandRect.SubRectVertical(2, 0).GetCentredInside(125, 125);
   IRECT freqBounds = bandRect.SubRectVertical(4, 2).SubRectHorizontal(2, 0).GetCentredInside(66, 66);
   IRECT qBounds = bandRect.SubRectVertical(4, 2).SubRectHorizontal(2, 1).GetCentredInside(66, 66);
   IRECT modeBounds = bandRect.SubRectVertical(4, 3).GetCentredInside(150, 30);
 
-  pGraphics->AttachControl(new IVKnobControl(gainBounds, gainParamIndex, bandLabel, DEFAULT_STYLE, true, false, -135, 135));
-  pGraphics->AttachControl(new IVKnobControl(freqBounds, freqParamIndex, "", DEFAULT_STYLE, true, false, -135, 135));
-  pGraphics->AttachControl(new IVKnobControl(qBounds, qParamIndex, "", DEFAULT_STYLE, true, false, -135, 135));
-  pGraphics->AttachControl(new IVTabSwitchControl(modeBounds, modeParamIndex, {"BELL", altLabel}, "", DEFAULT_STYLE));
+  pGraphics->AttachControl(new IVKnobControl(gainBounds, gainParamIndex, "", knobStyle, true, false, -135, 135, 0));
+  pGraphics->AttachControl(new IVKnobControl(freqBounds, freqParamIndex, "", knobStyle, true, false, -135, 135));
+  pGraphics->AttachControl(new IVKnobControl(qBounds, qParamIndex, "", knobStyle, true, false, -135, 135, 0));
+  pGraphics->AttachControl(new IVTabSwitchControl(modeBounds, modeParamIndex, {"BELL", altLabel}, "", switchStyle));
 }
 
 

@@ -14,6 +14,8 @@ enum EParams
   kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt,
   kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt,
   kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt,
+  kDyn1Thresh, kDyn1Attack, kDyn1Release, kDyn1Ratio, kDyn1Alt,
+  kDyn2Thresh, kDyn2Attack, kDyn2Release, kDyn2Ratio, kDyn2Alt,
   kNumParams
 };
 
@@ -30,7 +32,9 @@ class ChannelStrip final : public Plugin
 {
 public:
   ChannelStrip(const InstanceInfo& info);
-  void AttachBandControls(IGraphics* pGraphics, IRECT bandRect, int gainParamIndex, int freqParamIndex, int qParamIndex, int modeParamIndex, const char* bandLabel, const char* altLabel);
+  void ChannelStrip::AttachBandControls(IGraphics* pGraphics, IRECT bandRect,
+                                        IVStyle knobStyle, int gainParamIndex, int freqParamIndex, int qParamIndex,
+                                        IVStyle switchStyle, int modeParamIndex, const char* altLabel);
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
 public:
