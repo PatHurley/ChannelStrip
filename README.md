@@ -1,2 +1,2 @@
 # ChannelStrip
-A basic volume control effect plug-in with IGraphics GUI
+A fully featured audio processor built using the iPlug2 framework.
