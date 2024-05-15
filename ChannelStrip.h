@@ -33,8 +33,8 @@ class ChannelStrip final : public Plugin
 public:
   ChannelStrip(const InstanceInfo& info);
   void ChannelStrip::AttachBandControls(IGraphics* pGraphics, IRECT bandRect,
-                                        IVStyle knobStyle, int gainParamIndex, int freqParamIndex, int qParamIndex,
-                                        IVStyle switchStyle, int modeParamIndex, const char* altLabel);
+                                        int gainParamIndex, int freqParamIndex, int qParamIndex,
+                                        int modeParamIndex, const char* altLabel);
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
 public:
