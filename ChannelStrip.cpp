@@ -36,17 +36,17 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
   GetParam(kEqBand4Alt)->InitBool("", false);
 
-  GetParam(kDyn1Thresh)->InitDouble("", -18.0, -50.0, 0.0, 0.01, "dB");
+  GetParam(kDyn1Thresh)->InitDouble("", -60.0, -70.0, 0.0, 0.1, "dB");
   GetParam(kDyn1Alt)->InitBool("", false);
-  GetParam(kDyn1Attack)->InitDouble("", 15.0, .01, 1000.0, 0.01, "ms");
-  GetParam(kDyn1Release)->InitDouble("", 100.0, 5.0, 5000.0, 0.1, "ms");
-  GetParam(kDyn1Ratio)->InitInt("", 0, 0, 7);
+  GetParam(kDyn1Attack)->InitDouble("", .01, .01, 1000.0, 0.01, "ms");
+  GetParam(kDyn1Release)->InitDouble("", 150.0, 5.0, 5000.0, 0.1, "ms");
+  GetParam(kDyn1Ratio)->InitInt("", 5, 0, 7);
 
-  GetParam(kDyn2Thresh)->InitDouble("", -18.0, -50.0, 0.0, 0.01, "dB");
+  GetParam(kDyn2Thresh)->InitDouble("", -18.0, -70.0, 0.0, 0.1, "dB");
   GetParam(kDyn2Alt)->InitBool("", false);
   GetParam(kDyn2Attack)->InitDouble("", 15.0, .01, 1000.0, 0.01, "ms");
   GetParam(kDyn2Release)->InitDouble("", 100.0, 5.0, 5000.0, 0.1, "ms");
-  GetParam(kDyn2Ratio)->InitInt("", 0, 0, 7);
+  GetParam(kDyn2Ratio)->InitInt("", 1, 0, 7);
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
@@ -77,15 +77,23 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IRECT EQ4Bounds = EQBounds.SubRectHorizontal(4, 3).GetReducedFromTop(5);
 
     IRECT DYNBounds = IRECT(56, 250, 956, 500);
-    IRECT DYN1Bounds = DYNBounds.SubRectHorizontal(3, 0).GetReducedFromTop(5);
-    IRECT DYN2Bounds = DYNBounds.SubRectHorizontal(3, 2).GetReducedFromTop(5);
+    IRECT DYN1Bounds = DYNBounds.SubRectHorizontal(3, 0);
+    IRECT DYN2Bounds = DYNBounds.SubRectHorizontal(3, 2);
+    IRECT DYNDisplay = DYNBounds.SubRectHorizontal(3, 1).GetCentredInside(280, 200);
 
-    IRECT D1Thresh = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(4, 1).GetCentredInside(125);
-    IRECT D1Mode = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(3, 2).GetCentredInside(150, 30);
+    IRECT D1Thresh = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(6, 2).GetCentredInside(125);
+    IRECT D1Mode = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(7, 5).GetCentredInside(150, 30);
     IRECT D1Attack = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 0).GetCentredInside(66);
     IRECT D1Release = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 1).GetCentredInside(66);
     IRECT D1RatioSel = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(5, 0).GetCentredInside(60, 30);
     IRECT D1RatioInd = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(6, 3).GetCentredInside(60, 150);
+
+    IRECT D2Thresh = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(6, 2).GetCentredInside(125);
+    IRECT D2Mode = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(7, 5).GetCentredInside(150, 30);
+    IRECT D2Attack = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 0).GetCentredInside(66);
+    IRECT D2Release = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 1).GetCentredInside(66);
+    IRECT D2RatioSel = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(5, 0).GetCentredInside(60, 30);
+    IRECT D2RatioInd = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(6, 3).GetCentredInside(60, 150);
 
     // Style Definitions
     IVStyle ioMeterStyle = DEFAULT_STYLE
@@ -116,7 +124,8 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     AttachBandControls(pGraphics, EQ4Bounds, eqKnobStyle, eqSwitchStyle, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
 
     AttachDynControls(pGraphics, eqKnobStyle, eqSwitchStyle, D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd, kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio, "GATE", "EXPAND");
-    //AttachDynControls(pGraphics, eqKnobStyle, eqSwitchStyle, D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd, kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio, "COMP", "LIMIT");
+    AttachDynControls(pGraphics, eqKnobStyle, eqSwitchStyle, D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd, kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio, "COMP", "LIMIT");
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(128, 32, 32, 32)));
 
     IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", ioKnobStyle, true, false, -135.0, 27.0, 0.0);
     IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", ioMeterStyle);
@@ -203,4 +212,5 @@ void ChannelStrip::AttachDynControls(
   pGraphics->AttachControl(new IVKnobControl(attackBounds, attackIndex, "", knobStyle, true, false, -135, 135, 0));
   pGraphics->AttachControl(new IVKnobControl(releaseBounds, releaseIndex, "", knobStyle, true, false, -135, 135, 0));
   pGraphics->AttachControl(new IVRadioButtonControl(ratioIndBounds, ratioIndex, {"1:1", "2:1", "3:1", "4:1", "8:1", "10:1", "20:1", "INF"}, "", DEFAULT_STYLE));
+
 }
