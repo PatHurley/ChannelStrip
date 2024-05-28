@@ -34,15 +34,12 @@ public:
   ChannelStrip(const InstanceInfo& info);
 
   void ChannelStrip::AttachBandControls(
-    IGraphics* pGraphics,
-    IRECT bandRect,
-    IVStyle knobStyle, IVStyle switchStyle,
-    int gainParamIndex, int freqParamIndex, int qParamIndex, int modeParamIndex,
-    const char* altLabel);
+    IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle switchStyle, IRECT bandRect,
+    int gainParamIndex, int freqParamIndex, int qParamIndex,
+    int modeParamIndex, const char* altLabel);
 
   void ChannelStrip::AttachDynControls(
-    IGraphics* pGraphics,
-    IVStyle knobStyle, IVStyle buttonStyle,
+    IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle buttonStyle,
     IRECT threshBounds, IRECT modeBounds, IRECT attackBounds, IRECT releaseBounds, IRECT ratioSelBounds, IRECT ratioIndBounds,
     int threshIndex, int modeIndex, int attackIndex, int releaseIndex, int ratioIndex,
     const char* normLabel, const char* altLabel);
