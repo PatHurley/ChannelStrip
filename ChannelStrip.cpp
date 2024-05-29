@@ -61,12 +61,12 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
 
     // Asset Loading
     IBitmap EQFacePlate = pGraphics->LoadBitmap(PNG_EQBACKGROUND_FN);
-    ISVG EQKnobFrontSVG = pGraphics->LoadSVG(SVG_EQKNOBFACE_FN);
+    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE_FN);
 
     IBitmap DYNFacePlate = pGraphics->LoadBitmap(PNG_DYNBACKGROUND_FN);
-    ISVG DYNKnobFrontSVG = pGraphics->LoadSVG(SVG_DYNKNOBFACE_FN);
+    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE_FN);
 
-    ISVG KnobBackSVG = pGraphics->LoadSVG(SVG_KNOBBACK_FN);
+    ISVG KnobBack = pGraphics->LoadSVG(SVG_KNOBBACK_FN);
 
     // Control Bounds
     IRECT inputKnobBounds = IRECT(0, 460, 56, 510); // l, t, r, b
@@ -127,19 +127,19 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     pGraphics->AttachControl(new IBitmapControl(EQBounds, EQFacePlate)); // EQ Background
     pGraphics->AttachControl(new IBitmapControl(DYNBounds, DYNFacePlate)); // DYN Background
 
-    AttachBandControls(pGraphics, EQKnobFrontSVG, KnobBackSVG, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
-    AttachBandControls(pGraphics, EQKnobFrontSVG, KnobBackSVG, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
-    AttachBandControls(pGraphics, EQKnobFrontSVG, KnobBackSVG, eqSwitchStyle, EQ3Bounds, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "HI SHLF");
-    AttachBandControls(pGraphics, EQKnobFrontSVG, KnobBackSVG, eqSwitchStyle, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
+    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
+    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
+    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ3Bounds, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "HI SHLF");
+    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
 
     AttachDynControls(
-      pGraphics, DYNKnobFrontSVG, KnobBackSVG, dynSwitchStyle,
+      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle,
       D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd,
       kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio,
       "GATE", "EXPAND");
 
     AttachDynControls(
-      pGraphics, DYNKnobFrontSVG, KnobBackSVG, dynSwitchStyle,
+      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle,
       D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd,
       kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio,
       "COMP", "LIMIT");
@@ -206,26 +206,26 @@ void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 #endif
 
 void ChannelStrip::AttachBandControls(
-  IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle switchStyle, IRECT bandRect, 
+  IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle switchStyle, IRECT bandRect, 
   int gainParamIndex, int freqParamIndex, int qParamIndex,
   int modeParamIndex, const char* altLabel)
 {
   IRECT gainBounds = bandRect.SubRectVertical(2, 0).GetCentredInside(110);
   IRECT gainValue = gainBounds.GetCentredInside(50, 20).GetTranslated(0, 65);
-  pGraphics->AttachControl(new ISVGControl(gainBounds.GetPadded(2), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(gainBounds, knobFrontSVG, gainParamIndex));
+  pGraphics->AttachControl(new ISVGControl(gainBounds.GetPadded(2), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(gainBounds, knobFront, gainParamIndex));
   pGraphics->AttachControl(new ICaptionControl(gainValue, gainParamIndex, ChStTxt_White, 0, true));
 
   IRECT freqBounds = bandRect.SubRectVertical(4, 2).SubRectHorizontal(2, 0).GetCentredInside(50);
   IRECT freqValue = freqBounds.GetCentredInside(65, 20).GetTranslated(0, 35);
-  pGraphics->AttachControl(new ISVGControl(freqBounds.GetPadded(1.5), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(freqBounds, knobFrontSVG, freqParamIndex));
+  pGraphics->AttachControl(new ISVGControl(freqBounds.GetPadded(1.5), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(freqBounds, knobFront, freqParamIndex));
   pGraphics->AttachControl(new ICaptionControl(freqValue, freqParamIndex, ChStTxt_White, 0, true));
 
   IRECT qBounds = bandRect.SubRectVertical(4, 2).SubRectHorizontal(2, 1).GetCentredInside(50);
   IRECT qValue = qBounds.GetCentredInside(50, 20).GetTranslated(0, 35);
-  pGraphics->AttachControl(new ISVGControl(qBounds.GetPadded(1.5), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(qBounds, knobFrontSVG, qParamIndex));
+  pGraphics->AttachControl(new ISVGControl(qBounds.GetPadded(1.5), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(qBounds, knobFront, qParamIndex));
   pGraphics->AttachControl(new ICaptionControl(qValue, qParamIndex, ChStTxt_White, 0, true));
 
   IRECT modeBounds = bandRect.SubRectVertical(4, 3).GetCentredInside(150, 30);
@@ -233,24 +233,24 @@ void ChannelStrip::AttachBandControls(
 }
 
 void ChannelStrip::AttachDynControls(
-  IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle buttonStyle,
+  IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle buttonStyle,
   IRECT threshBounds, IRECT modeBounds, IRECT attackBounds, IRECT releaseBounds, IRECT ratioSelBounds, IRECT ratioIndBounds,
   int threshIndex, int modeIndex, int attackIndex, int releaseIndex, int ratioIndex,
   const char* normLabel, const char* altLabel)
 {
   IRECT threshValue = threshBounds.GetCentredInside(50, 20).GetTranslated(0, 65);
-  pGraphics->AttachControl(new ISVGControl(threshBounds.GetPadded(2), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(threshBounds, knobFrontSVG, threshIndex));
+  pGraphics->AttachControl(new ISVGControl(threshBounds.GetPadded(2), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(threshBounds, knobFront, threshIndex));
   pGraphics->AttachControl(new ICaptionControl(threshValue, threshIndex, ChStTxt_Black, 0, true));
 
   IRECT attackValue = attackBounds.GetCentredInside(60, 20).GetTranslated(0, 35);
-  pGraphics->AttachControl(new ISVGControl(attackBounds.GetPadded(1.5), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(attackBounds, knobFrontSVG, attackIndex));
+  pGraphics->AttachControl(new ISVGControl(attackBounds.GetPadded(1.5), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(attackBounds, knobFront, attackIndex));
   pGraphics->AttachControl(new ICaptionControl(attackValue, attackIndex, ChStTxt_Black, 0, true));
 
   IRECT releaseValue = releaseBounds.GetCentredInside(60, 20).GetTranslated(0, 35);
-  pGraphics->AttachControl(new ISVGControl(releaseBounds.GetPadded(1.5), knobBackSVG));
-  pGraphics->AttachControl(new ISVGKnobControl(releaseBounds, knobFrontSVG, releaseIndex));
+  pGraphics->AttachControl(new ISVGControl(releaseBounds.GetPadded(1.5), knobBack));
+  pGraphics->AttachControl(new ISVGKnobControl(releaseBounds, knobFront, releaseIndex));
   pGraphics->AttachControl(new ICaptionControl(releaseValue, releaseIndex, ChStTxt_Black, 0, true));
 
   pGraphics->AttachControl(new IVTabSwitchControl(modeBounds, modeIndex, {normLabel, altLabel}, "", buttonStyle));
