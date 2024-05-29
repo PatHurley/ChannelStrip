@@ -17,23 +17,23 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   GetParam(kGainOut)->InitDouble("", 0.0, -50.0, 10.0, 0.01, "dB");
 
   GetParam(kEqBand1Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
-  GetParam(kEqBand1Freq)->InitDouble("", 100.0, 20.0, 20000.0, 0.1, "Hz");
-  GetParam(kEqBand1Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
+  GetParam(kEqBand1Freq)->InitDouble("", 100.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
+  GetParam(kEqBand1Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
   GetParam(kEqBand1Alt)->InitBool("", false);
 
   GetParam(kEqBand2Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
-  GetParam(kEqBand2Freq)->InitDouble("", 1000.0, 20.0, 20000.0, 0.1, "Hz");
-  GetParam(kEqBand2Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
+  GetParam(kEqBand2Freq)->InitDouble("", 1000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
+  GetParam(kEqBand2Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
   GetParam(kEqBand2Alt)->InitBool("", false);
 
   GetParam(kEqBand3Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
-  GetParam(kEqBand3Freq)->InitDouble("", 5000.0, 20.0, 20000.0, 0.1, "Hz");
-  GetParam(kEqBand3Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
+  GetParam(kEqBand3Freq)->InitDouble("", 5000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
+  GetParam(kEqBand3Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
   GetParam(kEqBand3Alt)->InitBool("", false);
 
   GetParam(kEqBand4Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
-  GetParam(kEqBand4Freq)->InitDouble("", 10000.0, 20.0, 20000.0, 0.1, "Hz");
-  GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q");
+  GetParam(kEqBand4Freq)->InitDouble("", 10000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
+  GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
   GetParam(kEqBand4Alt)->InitBool("", false);
 
   GetParam(kDyn1Thresh)->InitDouble("", -60.0, -70.0, 0.0, 0.1, "dB");
@@ -90,14 +90,14 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IRECT D1Mode = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(7, 5).GetCentredInside(150, 30);
     IRECT D1Attack = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 0).GetCentredInside(50);
     IRECT D1Release = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 1).GetCentredInside(50);
-    IRECT D1RatioSel = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(5, 0).GetCentredInside(60, 30);
+    IRECT D1RatioSel = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(8, 1).GetCentredInside(60, 30);
     IRECT D1RatioInd = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(6, 3).GetCentredInside(60, 150);
 
     IRECT D2Thresh = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(6, 2).GetCentredInside(110);
     IRECT D2Mode = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(7, 5).GetCentredInside(150, 30);
     IRECT D2Attack = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 0).GetCentredInside(50);
     IRECT D2Release = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 1).GetCentredInside(50);
-    IRECT D2RatioSel = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(5, 0).GetCentredInside(60, 30);
+    IRECT D2RatioSel = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(8, 1).GetCentredInside(60, 30);
     IRECT D2RatioInd = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(6, 3).GetCentredInside(60, 150);
 
     // Style Definitions
@@ -113,15 +113,32 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IVStyle ioKnobStyle = DEFAULT_STYLE
       .WithValueText(ChStTxt_White);
 
-    IVStyle eqSwitchStyle = DEFAULT_STYLE;
-
+    IVStyle eqSwitchStyle = DEFAULT_STYLE
+      .WithShowValue(false)
+      .WithDrawShadows(false)
+      .WithColor(kFG, ChStWhite)
+      .WithColor(kPR, COLOR_WHITE)
+      .WithValueText(ChStTxt_Black);
+    
     IVStyle dynKnobStyle = DEFAULT_STYLE
       .WithColor(kFG, ChStBlack)
       .WithColor(kFR, ChStWhite)
       .WithColor(kX1, ChStBlack)
       .WithValueText(ChStTxt_Black);
 
-    IVStyle dynSwitchStyle = DEFAULT_STYLE;
+    IVStyle dynSwitchStyle = DEFAULT_STYLE
+      .WithShowValue(false)
+      .WithDrawShadows(false)
+      .WithColor(kFG, ChStBlack)
+      .WithColor(kPR, COLOR_BLACK)
+      .WithValueText(ChStTxt_White);
+
+    IVStyle ratioIndStyle = DEFAULT_STYLE
+      .WithColor(kFG, IColor(255, 96, 32, 32))
+      .WithColor(kFR, IColor(255, 64, 32, 32))
+      .WithColor(kON, IColor(255, 255, 0, 0))
+      .WithDrawShadows(false)
+      .WithValueText(ChStTxt_Black);
     
     // Control attachment
     pGraphics->AttachControl(new IBitmapControl(EQBounds, EQFacePlate)); // EQ Background
@@ -133,13 +150,13 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
 
     AttachDynControls(
-      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle,
+      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle,
       D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd,
       kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio,
       "GATE", "EXPAND");
 
     AttachDynControls(
-      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle,
+      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle,
       D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd,
       kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio,
       "COMP", "LIMIT");
@@ -212,7 +229,7 @@ void ChannelStrip::AttachBandControls(
 {
   IRECT gainBounds = bandRect.SubRectVertical(2, 0).GetCentredInside(110);
   IRECT gainValue = gainBounds.GetCentredInside(50, 20).GetTranslated(0, 65);
-  pGraphics->AttachControl(new ISVGControl(gainBounds.GetPadded(2), knobBack));
+  pGraphics->AttachControl(new ISVGControl(gainBounds.GetPadded(2.5), knobBack));
   pGraphics->AttachControl(new ISVGKnobControl(gainBounds, knobFront, gainParamIndex));
   pGraphics->AttachControl(new ICaptionControl(gainValue, gainParamIndex, ChStTxt_White, 0, true));
 
@@ -233,27 +250,37 @@ void ChannelStrip::AttachBandControls(
 }
 
 void ChannelStrip::AttachDynControls(
-  IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle buttonStyle,
+  IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle buttonStyle, IVStyle ratioIndStyle,
   IRECT threshBounds, IRECT modeBounds, IRECT attackBounds, IRECT releaseBounds, IRECT ratioSelBounds, IRECT ratioIndBounds,
   int threshIndex, int modeIndex, int attackIndex, int releaseIndex, int ratioIndex,
   const char* normLabel, const char* altLabel)
 {
+  IRECT threshLabel = threshBounds.GetCentredInside(50, 20).GetTranslated(0, -65);
   IRECT threshValue = threshBounds.GetCentredInside(50, 20).GetTranslated(0, 65);
+  pGraphics->AttachControl(new ITextControl(threshLabel, "THRESHOLD", ChStTxt_Black, 0, true));
   pGraphics->AttachControl(new ISVGControl(threshBounds.GetPadded(2), knobBack));
   pGraphics->AttachControl(new ISVGKnobControl(threshBounds, knobFront, threshIndex));
   pGraphics->AttachControl(new ICaptionControl(threshValue, threshIndex, ChStTxt_Black, 0, true));
 
+  IRECT attackLabel = attackBounds.GetCentredInside(60, 20).GetTranslated(0, -35);
   IRECT attackValue = attackBounds.GetCentredInside(60, 20).GetTranslated(0, 35);
+  pGraphics->AttachControl(new ITextControl(attackLabel, "ATK", ChStTxt_Black, 0, true));
   pGraphics->AttachControl(new ISVGControl(attackBounds.GetPadded(1.5), knobBack));
   pGraphics->AttachControl(new ISVGKnobControl(attackBounds, knobFront, attackIndex));
   pGraphics->AttachControl(new ICaptionControl(attackValue, attackIndex, ChStTxt_Black, 0, true));
 
+  IRECT releaseLabel = releaseBounds.GetCentredInside(60, 20).GetTranslated(0, -35);
   IRECT releaseValue = releaseBounds.GetCentredInside(60, 20).GetTranslated(0, 35);
+  pGraphics->AttachControl(new ITextControl(releaseLabel, "RLS", ChStTxt_Black, 0, true));
   pGraphics->AttachControl(new ISVGControl(releaseBounds.GetPadded(1.5), knobBack));
   pGraphics->AttachControl(new ISVGKnobControl(releaseBounds, knobFront, releaseIndex));
   pGraphics->AttachControl(new ICaptionControl(releaseValue, releaseIndex, ChStTxt_Black, 0, true));
 
   pGraphics->AttachControl(new IVTabSwitchControl(modeBounds, modeIndex, {normLabel, altLabel}, "", buttonStyle));
 
-  pGraphics->AttachControl(new IVRadioButtonControl(ratioIndBounds, ratioIndex, {"1:1", "2:1", "3:1", "4:1", "8:1", "10:1", "20:1", "INF"}, "", DEFAULT_STYLE));
+  pGraphics->AttachControl(new IVSwitchControl(ratioSelBounds, ratioIndex, "", buttonStyle, true));
+  pGraphics->AttachControl(new IVRadioButtonControl(ratioIndBounds, ratioIndex, {"1:1", "2:1", "3:1", "4:1", "8:1", "10:1", "20:1", "INF"}, "", ratioIndStyle));
+  auto buttonLabel = new ITextControl(ratioSelBounds, "RATIO", ChStTxt_White, 0, true);
+  buttonLabel->SetIgnoreMouse(true);
+  pGraphics->AttachControl(buttonLabel);
 }

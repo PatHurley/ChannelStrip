@@ -7,7 +7,7 @@
    viewBox="0 0 100 100"
    version="1.1"
    id="svg1"
-   inkscape:export-filename="..\..\Documents\Development\Audio\iPlug2\Projects\ChannelStrip\resources\img\KnobShade.png"
+   inkscape:export-filename="..\KnobBack.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
@@ -35,9 +35,21 @@
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer3" />
+     inkscape:current-layer="svg1" />
   <defs
      id="defs1">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#202020;stop-opacity:1;"
+         offset="0.80000001"
+         id="stop1" />
+      <stop
+         style="stop-color:#404040;stop-opacity:1;"
+         offset="0.96206373"
+         id="stop2" />
+    </linearGradient>
     <linearGradient
        id="linearGradient6"
        inkscape:collect="always">
@@ -51,29 +63,6 @@
          id="stop6" />
     </linearGradient>
     <linearGradient
-       id="linearGradient2"
-       inkscape:collect="always">
-      <stop
-         style="stop-color:#000000;stop-opacity:1;"
-         offset="0.98000002"
-         id="stop2" />
-      <stop
-         style="stop-color:#202020;stop-opacity:0;"
-         offset="1"
-         id="stop3" />
-    </linearGradient>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2"
-       id="radialGradient3"
-       cx="50"
-       cy="50"
-       fx="50"
-       fy="50"
-       r="49"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.99489788,0,0,0.99489788,0.2551013,0.25510208)" />
-    <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6"
        id="linearGradient7"
@@ -82,7 +71,18 @@
        x2="50.130245"
        y2="95.695068"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.98947368,0,0,0.98947368,0.52631577,0.52631577)" />
+       gradientTransform="matrix(1.0105264,0,0,1.0105263,-0.52631632,-0.52631581)" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="radialGradient2"
+       cx="50"
+       cy="50"
+       fx="50"
+       fy="50"
+       r="45.75"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0784369,-0.00239544,0.00242448,1.0915134,-4.0430675,-4.4559012)" />
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -90,19 +90,19 @@
      id="layer1"
      style="display:none">
     <circle
-       style="fill:url(#radialGradient3);stroke-width:1.15255"
+       style="fill:#000000;fill-opacity:1;stroke-width:1.15255"
        id="path1"
        cx="50"
        cy="50"
        inkscape:label="hole"
        r="48.75" />
     <circle
-       style="fill:url(#linearGradient7);fill-opacity:1;stroke-width:1.15231"
+       style="fill:url(#linearGradient7);fill-opacity:1;stroke-width:1.1768"
        id="path3"
        cx="50"
        cy="50"
        inkscape:label="edge"
-       r="47" />
+       r="48" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -116,34 +116,38 @@
        cy="50"
        r="46" />
     <circle
-       style="fill:#202020;fill-opacity:1;stroke-width:1.83621"
+       style="fill:url(#radialGradient2);fill-opacity:1;stroke-width:1.83621"
        id="path7"
        cx="50"
        cy="50"
        r="45.75" />
-    <rect
-       style="fill:#c0c0c0;fill-opacity:1;stroke-width:1.7586"
-       id="rect7"
-       width="4"
-       height="38.5"
-       x="48"
-       y="4" />
-    <path
-       sodipodi:type="star"
-       style="fill:#c0c0c0;fill-opacity:1"
-       id="path8"
-       inkscape:flatsided="false"
-       sodipodi:sides="3"
-       sodipodi:cx="49.762169"
-       sodipodi:cy="86.844551"
-       sodipodi:r1="25.838049"
-       sodipodi:r2="12.919022"
-       sodipodi:arg1="-1.5707963"
-       sodipodi:arg2="-0.52359878"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="m 49.76217,61.006502 11.1882,19.378538 11.188205,19.378536 -22.376406,-3e-6 -22.376407,2e-6 11.188206,-19.378535 z"
-       transform="matrix(-0.08937986,0,0,-0.10320697,54.447736,52.696296)"
-       inkscape:transform-center-y="0.66666691" />
+    <g
+       id="g1"
+       inkscape:label="line">
+      <path
+         sodipodi:type="star"
+         style="fill:#c0c0c0;fill-opacity:1"
+         id="path8"
+         inkscape:flatsided="false"
+         sodipodi:sides="3"
+         sodipodi:cx="49.762169"
+         sodipodi:cy="86.844551"
+         sodipodi:r1="25.838049"
+         sodipodi:r2="12.919022"
+         sodipodi:arg1="-1.5707963"
+         sodipodi:arg2="-0.52359878"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         d="m 49.76217,61.006502 11.1882,19.378538 11.188205,19.378536 -22.376406,-3e-6 -22.376407,2e-6 11.188206,-19.378535 z"
+         transform="matrix(-0.08937986,0,0,-0.10320697,54.447736,52.696296)"
+         inkscape:transform-center-y="0.66666691" />
+      <rect
+         style="display:inline;fill:#c0c0c0;fill-opacity:1;stroke-width:1.7586"
+         id="rect7"
+         width="4"
+         height="38.5"
+         x="48"
+         y="4" />
+    </g>
   </g>
 </svg>
