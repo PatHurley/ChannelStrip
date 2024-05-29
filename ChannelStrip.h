@@ -36,7 +36,7 @@ public:
   void ChannelStrip::AttachBandControls(
     IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle switchStyle, IRECT bandRect,
     int gainParamIndex, int freqParamIndex, int qParamIndex,
-    int modeParamIndex, const char* altLabel);
+    int modeParamIndex,  const char* altLabel);
 
   void ChannelStrip::AttachDynControls(
     IGraphics* pGraphics, ISVG knobFrontSVG, ISVG knobBackSVG, IVStyle buttonStyle,
