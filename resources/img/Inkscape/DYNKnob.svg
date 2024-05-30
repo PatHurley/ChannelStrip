@@ -28,12 +28,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="8.3597643"
-     inkscape:cx="36.843144"
+     inkscape:cx="36.783334"
      inkscape:cy="51.735908"
-     inkscape:window-width="1920"
-     inkscape:window-height="1111"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer2" />
   <defs
@@ -123,7 +123,8 @@
        r="45.75" />
     <g
        id="g1"
-       inkscape:label="line">
+       inkscape:label="line"
+       transform="translate(0,-0.5)">
       <path
          sodipodi:type="star"
          style="fill:#c0c0c0;fill-opacity:1"

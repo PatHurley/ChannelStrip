@@ -53,20 +53,21 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
   };
   
-  mLayoutFunc = [&](IGraphics* pGraphics) {  // GUI
+  mLayoutFunc = [&](IGraphics* pGraphics) {
     pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
-    pGraphics->AttachPanelBackground(ChStBlack);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
-    const IRECT b = pGraphics->GetBounds();
+    pGraphics->AttachPanelBackground(ChStBlack);
 
     // Asset Loading
     IBitmap EQFacePlate = pGraphics->LoadBitmap(PNG_EQBACKGROUND_FN);
-    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE_FN);
-
     IBitmap DYNFacePlate = pGraphics->LoadBitmap(PNG_DYNBACKGROUND_FN);
-    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE_FN);
 
     ISVG KnobBack = pGraphics->LoadSVG(SVG_KNOBBACK_FN);
+
+    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE_FN);
+    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE_FN);
+
+    ISVG DYNDisplayMask = pGraphics->LoadSVG(SVG_DYNDISPLAY_FN);
 
     // Control Bounds
     IRECT inputKnobBounds = IRECT(0, 460, 56, 510); // l, t, r, b
@@ -161,7 +162,9 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
       kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio,
       "COMP", "LIMIT");
 
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(128, 32, 32, 32))); // DYN meter background
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN meter background
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 64, 80, 56)));
+    pGraphics->AttachControl(new ISVGControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
 
     IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", ioKnobStyle, true, false, -135.0, 27.0, 0.0);
     IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", ioMeterStyle);

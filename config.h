@@ -60,3 +60,4 @@
 #define SVG_DYNKNOBFACE_FN "DYNKnobFace.svg"
 
 #define SVG_KNOBBACK_FN "KnobBack.svg"
+#define SVG_DYNDISPLAY_FN "DynDisplay.svg"
