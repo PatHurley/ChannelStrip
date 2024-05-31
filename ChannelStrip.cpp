@@ -54,7 +54,7 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   };
   
   mLayoutFunc = [&](IGraphics* pGraphics) {
-    //pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
+    pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
     pGraphics->AttachPanelBackground(ChStBlack);
 
@@ -103,13 +103,12 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
 
     // Style Definitions
     IVStyle ioMeterStyle = DEFAULT_STYLE
-      .WithLabelText(ChStTxt_White)                // Custom label text
-      .WithColor(kFG, IColor(255, 128, 255, 128))  // Signal Bars
-      .WithColor(kBG, IColor(255, 64, 32, 32))     // Background
-      .WithColor(kFR, ChStBlack)                   // Frame Lines
-      .WithColor(kHL, ChStBlack)                   // Level Marker lines
-      .WithColor(kX1, IColor(255, 232, 32, 32))    // Peak Marker line
-      .WithColor(kON, IColor(255, 128, 128, 255)); // On color
+      .WithLabelText(ChStTxt_White)               // Custom label text
+      .WithColor(kFG, IColor(136, 192, 192, 192)) // Signal Bars
+      .WithColor(kBG, 0)                          // Background
+      .WithColor(kFR, COLOR_BLACK)                // Frame Lines
+      .WithColor(kHL, COLOR_BLACK)                // Level Marker lines
+      .WithColor(kX1, IColor(255, 232, 32, 32));  // Peak Marker line
 
     IVStyle ioKnobStyle = DEFAULT_STYLE
       .WithValueText(ChStTxt_White);
@@ -117,9 +116,10 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IVStyle eqSwitchStyle = DEFAULT_STYLE
       .WithShowValue(false)
       .WithDrawShadows(false)
-      .WithColor(kFG, ChStWhite)
-      .WithColor(kPR, COLOR_WHITE)
-      .WithValueText(ChStTxt_Black);
+      .WithColor(kFG, IColor(255, 255, 255, 255))
+      .WithColor(kPR, IColor(255, 180, 180, 192))
+      .WithValueText(ChStTxt_Black)
+      .WithEmboss(true);
     
     IVStyle dynKnobStyle = DEFAULT_STYLE
       .WithColor(kFG, ChStBlack)
@@ -130,9 +130,10 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     IVStyle dynSwitchStyle = DEFAULT_STYLE
       .WithShowValue(false)
       .WithDrawShadows(false)
-      .WithColor(kFG, ChStBlack)
-      .WithColor(kPR, COLOR_BLACK)
-      .WithValueText(ChStTxt_White);
+      .WithColor(kFG, IColor(255, 32, 32, 32))
+      .WithColor(kPR, IColor(255, 0, 0, 0))
+      .WithValueText(ChStTxt_White)
+      .WithEmboss(true);
 
     IVStyle ratioIndStyle = DEFAULT_STYLE
       .WithColor(kFG, IColor(255, 96, 32, 32))
@@ -144,38 +145,19 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     // Control attachment
     pGraphics->AttachControl(new IBitmapControl(EQBounds, EQFacePlate)); // EQ Background
     pGraphics->AttachControl(new IBitmapControl(DYNBounds, DYNFacePlate)); // DYN Background
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN meter background
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN Display background
     pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 72, 80, 64)));
-    //pGraphics->AttachControl(new ISVGControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
 
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ3Bounds, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "HI SHLF");
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
 
-    AttachDynControls(
-      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle,
-      D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd,
-      kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio,
-      "GATE", "EXPAND");
+    AttachDynControls(pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle, D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd, kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio, "GATE", "EXPAND");
+    AttachDynControls(pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle, D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd, kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio, "COMP", "LIMIT");
 
-    AttachDynControls(
-      pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle,
-      D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd,
-      kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio,
-      "COMP", "LIMIT");
-
-    IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", ioKnobStyle, true, false, -135.0, 27.0, 0.0);
-    IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", ioMeterStyle);
-
-    pGraphics->AttachControl(inputKnob);
-    pGraphics->AttachControl(inputMeter, kCtrlTagInMeter);
-
-    IVKnobControl* outputKnob = new IVKnobControl(outputKnobBounds, kGainOut, "", ioKnobStyle, true, false, -135.0, 27.0, 0.0);
-    IVPeakAvgMeterControl<2>* outputMeter = new IVPeakAvgMeterControl<2>(outputMeterBounds, "OUT", ioMeterStyle);
-    
-    pGraphics->AttachControl(outputKnob);
-    pGraphics->AttachControl(outputMeter, kCtrlTagOutMeter);
+    AttachMeterControls(pGraphics, inputKnobBounds, inputMeterBounds, kGainIn, kCtrlTagInMeter, ioKnobStyle, ioMeterStyle, "IN");
+    AttachMeterControls(pGraphics, outputKnobBounds, outputMeterBounds, kGainOut, kCtrlTagOutMeter, ioKnobStyle, ioMeterStyle, "OUT");
   };
 #endif
 }
@@ -223,6 +205,23 @@ void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   mPeakAvgOutMeterSender.ProcessBlock(outputs, nFrames, kCtrlTagOutMeter);
 }
 #endif
+
+void ChannelStrip::AttachMeterControls(
+  IGraphics* pGraphics, IRECT gainBounds, IRECT meterBounds,
+  int gainIndex, int meterCtrlTag,  IVStyle knobStyle, IVStyle meterStyle,
+  const char* label)
+{
+  auto zone1 = IColor(255, 16, 40, 16);
+  auto zone2 = IColor(255, 40, 40, 16);
+  auto zone3 = IColor(255, 40, 16, 16);
+
+  pGraphics->AttachControl(new IPanelControl(meterBounds.GetFromBottom(271), zone1));
+  pGraphics->AttachControl(new IPanelControl(meterBounds.GetReducedFromBottom(271).GetReducedFromTop(74), zone2));
+  pGraphics->AttachControl(new IPanelControl(meterBounds.GetFromTop(74).GetReducedFromTop(16), zone3));
+
+  pGraphics->AttachControl(new IVKnobControl(gainBounds, gainIndex, "", knobStyle, true, false, -135.0, 27.0, 0.0));
+  pGraphics->AttachControl(new IVPeakAvgMeterControl<2>(meterBounds, label, meterStyle, EDirection::Vertical, {"", ""}, 0, -65.F, 10.F, {0, -18, -42, -60}), meterCtrlTag);
+}
 
 void ChannelStrip::AttachBandControls(
   IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle switchStyle, IRECT bandRect, 

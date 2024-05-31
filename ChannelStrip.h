@@ -33,6 +33,11 @@ class ChannelStrip final : public Plugin
 public:
   ChannelStrip(const InstanceInfo& info);
 
+  void ChannelStrip::AttachMeterControls(
+    IGraphics* pGraphics, IRECT gainBounds, IRECT meterBounds,
+    int gainIndex, int meterCtrlTag, IVStyle knobStyle, IVStyle meterStyle,
+    const char* label);
+
   void ChannelStrip::AttachBandControls(
     IGraphics* pGraphics, ISVG knobFront, ISVG knobBack, IVStyle switchStyle, IRECT bandRect,
     int gainParamIndex, int freqParamIndex, int qParamIndex,
