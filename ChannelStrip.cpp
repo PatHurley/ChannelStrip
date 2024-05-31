@@ -18,22 +18,22 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
 
   GetParam(kEqBand1Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
   GetParam(kEqBand1Freq)->InitDouble("", 100.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
-  GetParam(kEqBand1Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
+  GetParam(kEqBand1Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.3));
   GetParam(kEqBand1Alt)->InitBool("", false);
 
   GetParam(kEqBand2Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
   GetParam(kEqBand2Freq)->InitDouble("", 1000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
-  GetParam(kEqBand2Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
+  GetParam(kEqBand2Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.3));
   GetParam(kEqBand2Alt)->InitBool("", false);
 
   GetParam(kEqBand3Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
   GetParam(kEqBand3Freq)->InitDouble("", 5000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
-  GetParam(kEqBand3Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
+  GetParam(kEqBand3Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.3));
   GetParam(kEqBand3Alt)->InitBool("", false);
 
   GetParam(kEqBand4Gain)->InitDouble("", 0.0, -12.0, 12.0, 0.01, "dB");
   GetParam(kEqBand4Freq)->InitDouble("", 10000.0, 20.0, 20000.0, 0.1, "Hz", 0, "", IParam::ShapePowCurve(4.3));
-  GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.2));
+  GetParam(kEqBand4Q)->InitDouble("", 1.0, 0.01, 10.0, 0.01, "Q", 0, "", IParam::ShapePowCurve(3.3));
   GetParam(kEqBand4Alt)->InitBool("", false);
 
   GetParam(kDyn1Thresh)->InitDouble("", -60.0, -70.0, 0.0, 0.1, "dB");
@@ -54,7 +54,7 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   };
   
   mLayoutFunc = [&](IGraphics* pGraphics) {
-    pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
+    //pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
     pGraphics->AttachPanelBackground(ChStBlack);
 
@@ -144,6 +144,9 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     // Control attachment
     pGraphics->AttachControl(new IBitmapControl(EQBounds, EQFacePlate)); // EQ Background
     pGraphics->AttachControl(new IBitmapControl(DYNBounds, DYNFacePlate)); // DYN Background
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN meter background
+    pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 72, 80, 64)));
+    //pGraphics->AttachControl(new ISVGControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
 
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
@@ -161,10 +164,6 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
       D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd,
       kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio,
       "COMP", "LIMIT");
-
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN meter background
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 64, 80, 56)));
-    pGraphics->AttachControl(new ISVGControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
 
     IVKnobControl* inputKnob = new IVKnobControl(inputKnobBounds, kGainIn, "", ioKnobStyle, true, false, -135.0, 27.0, 0.0);
     IVPeakAvgMeterControl<2>* inputMeter = new IVPeakAvgMeterControl<2>(inputMeterBounds, "IN", ioMeterStyle);
