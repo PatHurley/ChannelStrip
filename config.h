@@ -53,11 +53,10 @@
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
 
-#define PNG_EQBACKGROUND_FN "EQFacePlate.png"
-#define SVG_EQKNOBFACE_FN "EQKnobFace.svg"
+#define PNG_EQBACKGROUND "EQFacePlate.png"
+#define PNG_DYNBACKGROUND "DYNFacePlate.png"
+#define PNG_DYNDISPLAY "DynDisplay.png"
 
-#define PNG_DYNBACKGROUND_FN "DYNFacePlate.png"
-#define SVG_DYNKNOBFACE_FN "DYNKnobFace.svg"
-
-#define SVG_KNOBBACK_FN "KnobBack.svg"
-#define SVG_DYNDISPLAY_FN "DynDisplay.svg"
+#define SVG_KNOBBACK "KnobBack.svg"
+#define SVG_EQKNOBFACE "EQKnobFace.svg"
+#define SVG_DYNKNOBFACE "DYNKnobFace.svg"

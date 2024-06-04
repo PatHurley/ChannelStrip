@@ -59,15 +59,13 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     pGraphics->AttachPanelBackground(ChStBlack);
 
     // Asset Loading
-    IBitmap EQFacePlate = pGraphics->LoadBitmap(PNG_EQBACKGROUND_FN);
-    IBitmap DYNFacePlate = pGraphics->LoadBitmap(PNG_DYNBACKGROUND_FN);
+    IBitmap EQFacePlate = pGraphics->LoadBitmap(PNG_EQBACKGROUND);
+    IBitmap DYNFacePlate = pGraphics->LoadBitmap(PNG_DYNBACKGROUND);
+    IBitmap DYNDisplayMask = pGraphics->LoadBitmap(PNG_DYNDISPLAY);
 
-    ISVG KnobBack = pGraphics->LoadSVG(SVG_KNOBBACK_FN);
-
-    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE_FN);
-    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE_FN);
-
-    ISVG DYNDisplayMask = pGraphics->LoadSVG(SVG_DYNDISPLAY_FN);
+    ISVG KnobBack = pGraphics->LoadSVG(SVG_KNOBBACK);
+    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE);
+    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE);
 
     // Control Bounds
     IRECT inputKnobBounds = IRECT(0, 460, 56, 510); // l, t, r, b
@@ -147,6 +145,7 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     pGraphics->AttachControl(new IBitmapControl(DYNBounds, DYNFacePlate)); // DYN Background
     pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN Display background
     pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 72, 80, 64)));
+    pGraphics->AttachControl(new IBitmapControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
 
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
     AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
