@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChannelStrip-app", "projects\ChannelStrip-app.vcxproj", "{41785AE4-5B70-4A75-880B-4B418B4E13C6}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChannelStrip-vst3", "projects\ChannelStrip-vst3.vcxproj", "{079FC65A-F0E5-4E97-B318-A16D1D0B89DF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChannelStrip-aax", "projects\ChannelStrip-aax.vcxproj", "{DC4B5920-933D-4C82-B842-F34431D55A93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8E4B9B3E-64A5-4144-A989-84F6787D2661}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

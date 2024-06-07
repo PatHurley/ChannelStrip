@@ -55,8 +55,9 @@
 
 #define PNG_EQBACKGROUND "EQFacePlate.png"
 #define PNG_DYNBACKGROUND "DYNFacePlate.png"
-#define PNG_DYNDISPLAY "DynDisplay.png"
 
 #define SVG_KNOBBACK "KnobBack.svg"
 #define SVG_EQKNOBFACE "EQKnobFace.svg"
 #define SVG_DYNKNOBFACE "DYNKnobFace.svg"
+#define SVG_DYNDISPLAYFACE "DYNDisplayFace.svg"
+#define SVG_DYNDISPLAYNEEDLE "DYNDisplayNeedle.svg"

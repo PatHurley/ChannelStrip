@@ -1,18 +1,21 @@
 #include "ChannelStrip.h"
+#include "UI.h"
+
 #include "IPlug_include_in_plug_src.h"
 #include "IControls.h"
 #include "IPlugPaths.h"
 
-IColor ChStWhite = IColor(255, 224, 224, 224);
-IColor ChStBlack = IColor(255, 32, 32, 32);
-
-IText ChStTxt_White = IText(16.f, ChStWhite, "Roboto-Regular", EAlign::Center, EVAlign::Top);
-IText ChStTxt_Black = IText(16.f, ChStBlack, "Roboto-Regular", EAlign::Center, EVAlign::Bottom);
+auto ChStWhite     = IColor(255, 224, 224, 224);
+auto ChStBlack     = IColor(255, 32, 32, 32);
+auto ChStTxt_White = IText(16.f, ChStWhite, "Roboto-Regular", EAlign::Center, EVAlign::Top);
+auto ChStTxt_Black = IText(16.f, ChStBlack, "Roboto-Regular", EAlign::Center, EVAlign::Bottom);
 
 ChannelStrip::ChannelStrip(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
   //Initialize Parameters
+  mSampleRate = GetSampleRate();
+
   GetParam(kGainIn)->InitDouble("", 0.0, -50.0, 10.0, 0.01, "dB");
   GetParam(kGainOut)->InitDouble("", 0.0, -50.0, 10.0, 0.01, "dB");
 
@@ -48,6 +51,8 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
   GetParam(kDyn2Release)->InitDouble("", 100.0, 5.0, 5000.0, 0.1, "ms");
   GetParam(kDyn2Ratio)->InitInt("", 1, 0, 7);
 
+  GetParam(kDynMeter)->InitDouble("", 0.0, 0.0, 72.0, 0.01, "dB");
+
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
@@ -59,54 +64,55 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
     pGraphics->AttachPanelBackground(ChStBlack);
 
     // Asset Loading
-    IBitmap EQFacePlate = pGraphics->LoadBitmap(PNG_EQBACKGROUND);
-    IBitmap DYNFacePlate = pGraphics->LoadBitmap(PNG_DYNBACKGROUND);
-    IBitmap DYNDisplayMask = pGraphics->LoadBitmap(PNG_DYNDISPLAY);
+    IBitmap EQ_BG_PNG = pGraphics->LoadBitmap(PNG_EQBACKGROUND);
+    IBitmap DYN_BG_PNG = pGraphics->LoadBitmap(PNG_DYNBACKGROUND);
 
-    ISVG KnobBack = pGraphics->LoadSVG(SVG_KNOBBACK);
-    ISVG EQKnobFront = pGraphics->LoadSVG(SVG_EQKNOBFACE);
-    ISVG DYNKnobFront = pGraphics->LoadSVG(SVG_DYNKNOBFACE);
+    ISVG KnobBack_SVG = pGraphics->LoadSVG(SVG_KNOBBACK);
+    ISVG EQKnobFace_SVG = pGraphics->LoadSVG(SVG_EQKNOBFACE);
+    ISVG DYNKnobFace_SVG = pGraphics->LoadSVG(SVG_DYNKNOBFACE);
+    ISVG DYNDisplayFace = pGraphics->LoadSVG(SVG_DYNDISPLAYFACE);
+    ISVG DYNDisplayNeedle = pGraphics->LoadSVG(SVG_DYNDISPLAYNEEDLE);
 
     // Control Bounds
-    IRECT inputKnobBounds = IRECT(0, 460, 56, 510); // l, t, r, b
-    IRECT inputMeterBounds = IRECT(6, 6, 50, 454);
+    IRECT inputKnob_Bounds = IRECT(0, 460, 56, 510); // l, t, r, b
+    IRECT inputMeter_Bounds = IRECT(6, 6, 50, 454);
 
-    IRECT outputKnobBounds = IRECT(956, 460, 1012, 510);
-    IRECT outputMeterBounds = IRECT(962, 6, 1006, 454);
+    IRECT outputKnob_Bounds = IRECT(956, 460, 1012, 510);
+    IRECT outputMeter_Bounds = IRECT(962, 6, 1006, 454);
 
-    IRECT EQBounds = IRECT(56, 0, 956, 250);
-    IRECT EQ1Bounds = EQBounds.SubRectHorizontal(4, 0).GetReducedFromTop(5);
-    IRECT EQ2Bounds = EQBounds.SubRectHorizontal(4, 1).GetReducedFromTop(5);
-    IRECT EQ3Bounds = EQBounds.SubRectHorizontal(4, 2).GetReducedFromTop(5);
-    IRECT EQ4Bounds = EQBounds.SubRectHorizontal(4, 3).GetReducedFromTop(5);
+    IRECT EQ_Bounds = IRECT(56, 0, 956, 250);
+    IRECT EQ1_Bounds = EQ_Bounds.SubRectHorizontal(4, 0).GetReducedFromTop(5);
+    IRECT EQ2_Bounds = EQ_Bounds.SubRectHorizontal(4, 1).GetReducedFromTop(5);
+    IRECT EQ3_Bounds = EQ_Bounds.SubRectHorizontal(4, 2).GetReducedFromTop(5);
+    IRECT EQ4_Bounds = EQ_Bounds.SubRectHorizontal(4, 3).GetReducedFromTop(5);
 
-    IRECT DYNBounds = IRECT(56, 250, 956, 500);
-    IRECT DYN1Bounds = DYNBounds.SubRectHorizontal(3, 0);
-    IRECT DYN2Bounds = DYNBounds.SubRectHorizontal(3, 2);
-    IRECT DYNDisplay = DYNBounds.SubRectHorizontal(3, 1).GetCentredInside(280, 230);
+    IRECT DYN_Bounds = IRECT(56, 250, 956, 500);
+    IRECT DYN1_Bounds = DYN_Bounds.SubRectHorizontal(3, 0);
+    IRECT DYN2_Bounds = DYN_Bounds.SubRectHorizontal(3, 2);
+    IRECT DYND_Bounds = DYN_Bounds.SubRectHorizontal(3, 1).GetPadded(-5);
 
-    IRECT D1Thresh = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(6, 2).GetCentredInside(110);
-    IRECT D1Mode = DYN1Bounds.SubRectHorizontal(2, 1).SubRectVertical(7, 5).GetCentredInside(150, 30);
-    IRECT D1Attack = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 0).GetCentredInside(50);
-    IRECT D1Release = DYN1Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 1).GetCentredInside(50);
-    IRECT D1RatioSel = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(8, 1).GetCentredInside(60, 30);
-    IRECT D1RatioInd = DYN1Bounds.SubRectHorizontal(4, 0).SubRectVertical(6, 3).GetCentredInside(60, 150);
+    IRECT D1Thresh = DYN1_Bounds.SubRectHorizontal(2, 1).SubRectVertical(6, 2).GetCentredInside(110);
+    IRECT D1Mode = DYN1_Bounds.SubRectHorizontal(2, 1).SubRectVertical(7, 5).GetCentredInside(150, 30);
+    IRECT D1Attack = DYN1_Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 0).GetCentredInside(50);
+    IRECT D1Release = DYN1_Bounds.SubRectHorizontal(4, 1).SubRectVertical(2, 1).GetCentredInside(50);
+    IRECT D1RatioSel = DYN1_Bounds.SubRectHorizontal(4, 0).SubRectVertical(8, 1).GetCentredInside(60, 30);
+    IRECT D1RatioInd = DYN1_Bounds.SubRectHorizontal(4, 0).SubRectVertical(6, 3).GetCentredInside(60, 150);
 
-    IRECT D2Thresh = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(6, 2).GetCentredInside(110);
-    IRECT D2Mode = DYN2Bounds.SubRectHorizontal(2, 0).SubRectVertical(7, 5).GetCentredInside(150, 30);
-    IRECT D2Attack = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 0).GetCentredInside(50);
-    IRECT D2Release = DYN2Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 1).GetCentredInside(50);
-    IRECT D2RatioSel = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(8, 1).GetCentredInside(60, 30);
-    IRECT D2RatioInd = DYN2Bounds.SubRectHorizontal(4, 3).SubRectVertical(6, 3).GetCentredInside(60, 150);
+    IRECT D2Thresh = DYN2_Bounds.SubRectHorizontal(2, 0).SubRectVertical(6, 2).GetCentredInside(110);
+    IRECT D2Mode = DYN2_Bounds.SubRectHorizontal(2, 0).SubRectVertical(7, 5).GetCentredInside(150, 30);
+    IRECT D2Attack = DYN2_Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 0).GetCentredInside(50);
+    IRECT D2Release = DYN2_Bounds.SubRectHorizontal(4, 2).SubRectVertical(2, 1).GetCentredInside(50);
+    IRECT D2RatioSel = DYN2_Bounds.SubRectHorizontal(4, 3).SubRectVertical(8, 1).GetCentredInside(60, 30);
+    IRECT D2RatioInd = DYN2_Bounds.SubRectHorizontal(4, 3).SubRectVertical(6, 3).GetCentredInside(60, 150);
 
     // Style Definitions
     IVStyle ioMeterStyle = DEFAULT_STYLE
-      .WithLabelText(ChStTxt_White)               // Custom label text
-      .WithColor(kFG, IColor(136, 192, 192, 192)) // Signal Bars
-      .WithColor(kBG, 0)                          // Background
-      .WithColor(kFR, COLOR_BLACK)                // Frame Lines
-      .WithColor(kHL, COLOR_BLACK)                // Level Marker lines
-      .WithColor(kX1, IColor(255, 232, 32, 32));  // Peak Marker line
+      .WithLabelText(ChStTxt_White)              // Custom label text
+      .WithColor(kFG, IColor(64, 172, 192, 208)) // Signal Bars
+      .WithColor(kBG, 0)                         // Background
+      .WithColor(kFR, COLOR_BLACK)               // Frame Lines
+      .WithColor(kHL, COLOR_BLACK)               // Level Marker lines
+      .WithColor(kX1, IColor(255, 232, 32, 32)); // Peak Marker line
 
     IVStyle ioKnobStyle = DEFAULT_STYLE
       .WithValueText(ChStTxt_White);
@@ -118,7 +124,7 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
       .WithColor(kPR, IColor(255, 180, 180, 192))
       .WithValueText(ChStTxt_Black)
       .WithEmboss(true);
-    
+
     IVStyle dynKnobStyle = DEFAULT_STYLE
       .WithColor(kFG, ChStBlack)
       .WithColor(kFR, ChStWhite)
@@ -139,41 +145,55 @@ ChannelStrip::ChannelStrip(const InstanceInfo& info)
       .WithColor(kON, IColor(255, 255, 0, 0))
       .WithDrawShadows(false)
       .WithValueText(ChStTxt_Black);
-    
+
     // Control attachment
-    pGraphics->AttachControl(new IBitmapControl(EQBounds, EQFacePlate)); // EQ Background
-    pGraphics->AttachControl(new IBitmapControl(DYNBounds, DYNFacePlate)); // DYN Background
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay, IColor(255, 32, 36, 36))); // DYN Display background
-    pGraphics->AttachControl(new IPanelControl(DYNDisplay.GetCentredInside(240, 210), IColor(255, 72, 80, 64)));
-    pGraphics->AttachControl(new IBitmapControl(DYNDisplay.GetCentredInside(240, 210), DYNDisplayMask));
+    pGraphics->AttachControl(new IBitmapControl(EQ_Bounds, EQ_BG_PNG));                // EQ Background
+    pGraphics->AttachControl(new IBitmapControl(DYN_Bounds, DYN_BG_PNG));              // DYN Background
+    pGraphics->AttachControl(new IPanelControl(DYND_Bounds, IColor(255, 32, 36, 36))); // DYN Display background
 
-    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ1Bounds, kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
-    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ2Bounds, kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
-    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ3Bounds, kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "HI SHLF");
-    AttachBandControls(pGraphics, EQKnobFront, KnobBack, eqSwitchStyle, EQ4Bounds, kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
+    AttachMeterControls(
+      pGraphics, inputKnob_Bounds, inputMeter_Bounds,
+      kGainIn, kCtrlTagInMeter, ioKnobStyle, ioMeterStyle, "IN");
+    AttachMeterControls(
+      pGraphics, outputKnob_Bounds, outputMeter_Bounds,
+      kGainOut, kCtrlTagOutMeter, ioKnobStyle, ioMeterStyle, "OUT");
 
-    AttachDynControls(pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle, D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd, kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio, "GATE", "EXPAND");
-    AttachDynControls(pGraphics, DYNKnobFront, KnobBack, dynSwitchStyle, ratioIndStyle, D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd, kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio, "COMP", "LIMIT");
+    AttachBandControls(
+      pGraphics, EQKnobFace_SVG, KnobBack_SVG, eqSwitchStyle, EQ1_Bounds,
+      kEqBand1Gain, kEqBand1Freq, kEqBand1Q, kEqBand1Alt, "HPF");
+    AttachBandControls(
+      pGraphics, EQKnobFace_SVG, KnobBack_SVG, eqSwitchStyle, EQ2_Bounds,
+      kEqBand2Gain, kEqBand2Freq, kEqBand2Q, kEqBand2Alt, "LO SHLF");
+    AttachBandControls(
+      pGraphics, EQKnobFace_SVG, KnobBack_SVG, eqSwitchStyle, EQ3_Bounds,
+      kEqBand3Gain, kEqBand3Freq, kEqBand3Q, kEqBand3Alt, "HI SHLF");
+    AttachBandControls(
+      pGraphics, EQKnobFace_SVG, KnobBack_SVG, eqSwitchStyle, EQ4_Bounds,
+      kEqBand4Gain, kEqBand4Freq, kEqBand4Q, kEqBand4Alt, "LPF");
 
-    AttachMeterControls(pGraphics, inputKnobBounds, inputMeterBounds, kGainIn, kCtrlTagInMeter, ioKnobStyle, ioMeterStyle, "IN");
-    AttachMeterControls(pGraphics, outputKnobBounds, outputMeterBounds, kGainOut, kCtrlTagOutMeter, ioKnobStyle, ioMeterStyle, "OUT");
+    AttachDynControls(
+      pGraphics, DYNKnobFace_SVG, KnobBack_SVG, dynSwitchStyle, ratioIndStyle,
+      D1Thresh, D1Mode, D1Attack, D1Release, D1RatioSel, D1RatioInd,
+      kDyn1Thresh, kDyn1Alt, kDyn1Attack, kDyn1Release, kDyn1Ratio, "GATE", "EXPAND");
+    AttachDynControls(
+      pGraphics, DYNKnobFace_SVG, KnobBack_SVG, dynSwitchStyle, ratioIndStyle,
+      D2Thresh, D2Mode, D2Attack, D2Release, D2RatioSel, D2RatioInd,
+      kDyn2Thresh, kDyn2Alt, kDyn2Attack, kDyn2Release, kDyn2Ratio, "COMP", "LIMIT");
+
+    //// Dynamics Display
+    //pGraphics->AttachControl(new IPanelControl(DYND_Bounds.GetHPadded(-20).GetVPadded(-10), IColor(255, 72, 80, 64)));
+    //pGraphics->AttachControl(new ISVGControl(DYND_Bounds.GetHPadded(-25).GetVPadded(-15), DYNDisplayFace));
+    //auto meterNeedle  = new ISVGKnobControl(DYND_Bounds.GetVShifted(55).GetCentredInside(280), DYNDisplayNeedle, kDynMeter);
+    //auto meterReadout = new ICaptionControl(DYND_Bounds.GetCentredInside(50, 20).GetTranslated(0, -20), kDynMeter, ChStTxt_Black, 0, true);
+    //meterNeedle->SetIgnoreMouse(true);
+    //meterReadout->SetIgnoreMouse(true);
+    //pGraphics->AttachControl(meterNeedle);
+    //pGraphics->AttachControl(meterReadout);
   };
 #endif
 }
 
 #if IPLUG_DSP
-void ChannelStrip::OnIdle()
-{
-  mPeakAvgInMeterSender.TransmitData(*this);
-  mPeakAvgOutMeterSender.TransmitData(*this);
-}
-
-void ChannelStrip::OnReset()
-{
-  mPeakAvgInMeterSender.Reset(GetSampleRate());
-  mPeakAvgOutMeterSender.Reset(GetSampleRate());
-}
-
 void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
   const double gainIn = GetParam(kGainIn)->Value();
@@ -184,13 +204,19 @@ void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   std::vector<double> signalLevelsIn(nChans, 0.0);
   std::vector<double> signalLevelsOut(nChans, 0.0);
 
+  std::vector<std::vector<sample>> inSignalBuffer(nChans, std::vector<sample>(nFrames, 0.0));
+
   for (int s = 0; s < nFrames; s++) {
     for (int c = 0; c < nChans; c++) {
+      double inSample = inputs[c][s];
+
       // Apply input gain
-      outputs[c][s] = inputs[c][s] * pow(10.0, gainIn / 20.00);
-      signalLevelsIn[c] += outputs[c][s] * outputs[c][s];
+      double gainedInput = inSample * pow(10.0, gainIn / 20.00);
+      outputs[c][s] = inSignalBuffer[c][s] = gainedInput; // apply the gain to the output signal, and store the signal level to the buffer
+      signalLevelsIn[c] += gainedInput * gainedInput;
 
       // TODO: Apply EQ
+
 
       // TODO: Apply DYN
 
@@ -200,8 +226,25 @@ void ChannelStrip::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
     }
   }
 
-  mPeakAvgInMeterSender.ProcessBlock(inputs, nFrames, kCtrlTagInMeter);
+  std::vector<sample*> inPostSignal(nChans);
+  for (int c = 0; c < nChans; c++) {
+    inPostSignal[c] = inSignalBuffer[c].data();
+  }
+  mPeakAvgInMeterSender.ProcessBlock(inPostSignal.data(), nFrames, kCtrlTagInMeter);
   mPeakAvgOutMeterSender.ProcessBlock(outputs, nFrames, kCtrlTagOutMeter);
+  //mPeakAvgDynMeterSender.ProcessBlock(, nFrames, kCtrlTagDynMeter);
+}
+
+void ChannelStrip::OnIdle()
+{
+  mPeakAvgInMeterSender.TransmitData(*this);
+  mPeakAvgOutMeterSender.TransmitData(*this);
+}
+
+void ChannelStrip::OnReset()
+{
+  mPeakAvgInMeterSender.Reset(GetSampleRate());
+  mPeakAvgOutMeterSender.Reset(GetSampleRate());
 }
 #endif
 

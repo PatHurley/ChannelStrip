@@ -256,4 +256,7 @@
       <Filter>config</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\ChannelStrip.ico" />
+  </ItemGroup>
 </Project>
